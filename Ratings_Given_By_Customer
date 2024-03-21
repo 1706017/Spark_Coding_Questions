@@ -1,0 +1,34 @@
+DataSet Schema: 
+userid, movieid, ratings, time_at_which_user_saw_movie(this is unix timestamp)
+
+Sample dataset:
+196,123,4,19808378
+134,124,5,19876543
+145,567,1,34534534
+
+Problem staement:
+q1) How many times movie were rated 5 star?
+q2) How many times movie were rated 4 star?
+q3) How many times movie were rated 3 star?
+q4) How many times movie were rated 2 star?
+q5) How many times movie were rated 1 star?
+
+
+Code in scala:
+val rdd1 = sc.textFile("/user/cloudera/sparkInput/customer_review.csv")
+val rdd2 = rdd1.map(x=>x.split(",")(2))
+val rdd3 = rdd2.map(x=>(x,1))
+val rdd4 = rdd3.reduceByKey((x,y) => x+y)
+rdd4.saveAsTextFile("/user/cloudera/sparkoutput/")
+
+
+CODE IN PYTHON:
+from pyspark import SparkContext
+
+sc = SparkContext()
+
+rdd1 = sc.textFile("/user/cloudera/sparkinput/customer_review.csv")
+rdd2 = rdd1.map(lambda x:x.split(",")[2])
+rdd3 = rdd2.map(lambda x:(x,1))
+rdd4 = rdd3.reduceByKey(lamda x,y:x+y)
+rdd4.saveAsTextFile("/user/cloudera/sparkoutput/")
