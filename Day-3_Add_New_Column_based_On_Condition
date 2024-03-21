@@ -1,0 +1,47 @@
+Q4)
+Problem Statement: we have a data set containing column as name,location,role and we want to add a new column value as Y or N if the role is equal to DataEngineer 
+
+Sample dataset:
+
+Name,location,role
+
+Amrit,Banaglore,Data Engineer
+Manash,Kolkata,Backend Developer
+Kumar,Banaglore,Frontend Developer
+Hari,Hyderabad,Data Engineer
+
+Expected Output:
+Amrit,Bangalore,Data Engineer,Y
+Manash,Kolkata,Backend Developer,N
+Kumar,Banaglore,Frontend Developer,N
+Hari,Hyderabad,Data Engineer,Y
+
+Code in scala:
+
+val rdd1 = sc.textFile("/user/cloudera/sparkinput/employee.csv")
+val rdd2 = rdd1.map(line => {
+	var fields = line.split(",")
+	if(fields(2) == "Data Engineer")
+	{
+	  (fields(0),fields(1),fields(2),"Y")
+	}
+	else
+	{
+	 (fields(0),fields(1),fields(2),"N")
+	}
+})
+
+rdd2.saveAsTextFile("/user/cloudera/sparkOutput/")
+
+Code in Python:
+
+from pyspark import SparkContext
+
+sc = SparkContext()
+
+rdd1 = sc.textFile("/user/cloudera/sparkInput/employee.csv")
+
+rdd2 = rdd1.map(lambda lines:lines.split(",")).map(lambda fields:
+(fields[0],fields[1],fields[2],"Y" if fields[2] == "Data Engineer" else "N"))
+
+rdd2.saveAsTextFile("/user/cloudera/sparkOutput/")
