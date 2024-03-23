@@ -1,0 +1,56 @@
+Sample Input:
+
+01,I am Big Data ,12312356,25.02
+34,Big data is very easy to learn,12565452,78.90
+56,I am learning big data so that to be a good data engineer,67.89
+
+
+Sample output we want after doing some transformations:
+(I,25.02 + 67.89) => (I,92.91)
+(am,25.02+67.89) => (am,92.91)
+(big,25.02+78.90+67.89) => (big,171.81)
+
+
+val rdd1 = sc.textFile("/user/cloudera/sparkinput/file1.csv")
+
+input:
+
+01,I am Big Data ,12312356,25.02
+34,Big data is very easy to learn,12565452,78.90
+56,I am learning big data so that to be a good data engineer,67.89
+
+val rdd2 = rdd1.map(x=>(x.split(",")(1),x.split("3").toFloat))
+
+output after doing map:
+
+(I am Big Data,25.02) 
+(Big data is very easy to learn,78.90) 
+(I am learning big data so that to be a good data engineer,67.89)
+
+val rdd3 = rdd2.map(x=>(x.split(",")(3).toFloat,x.split(",")(1)))
+
+output after doing map for second time:
+
+(25.02,I am Big Data)
+(78.9,Big data is very easy to learn)
+(67.89,I am learning big data so that to be a good data engineer)
+
+val rdd4 = rdd3.flatMapValues(x=>x.split(" "))
+
+output after doing flatMapValues:
+(25.02,I) (25.02,am) (25.02,Big) (25.02,Data)
+(78.9,Big) (78.9,data) (78.9,is) (78.9,easy) (78.9,to) (78.9,learn)
+(67.89,I) (67.89,am) (67.89,learning) (67.89,big) (67.89,data) 
+
+val rdd5 = rdd4.map(x=>(x._2.toLowerCase(),x._1))
+
+output after doing map for 3rd Time:
+(i,25.02) (am,25.02) (big,25.02) (data,25.02)
+(big,78.9) (data,78.9) (is,78.9) (easy,78.9) (to,78.9) (learn,78.9)
+(i,67.89) (am,67.89) (learning,67.89) (big,67.89) (data,67.89)
+
+val rdd6 = rdd5.reduceByKey((x,y) =>x+y)
+
+output after doing reduceByKey:
+
+(i,92.91) (am,92.91) (big,171.81) and so on ......
