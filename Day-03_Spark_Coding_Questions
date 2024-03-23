@@ -54,3 +54,76 @@ val rdd6 = rdd5.reduceByKey((x,y) =>x+y)
 output after doing reduceByKey:
 
 (i,92.91) (am,92.91) (big,171.81) and so on ......
+
+
+
+
+#########################################################################################################
+#########################################################################################################
+
+Q6)***
+
+Sample dataset for Log File:
+
+"WARN: Tuesday 4th sep 2023 0408"
+"WARN: Tuesday 5th Sep 2023 0897"
+"ERROR: Thursday 8th Nov 2022 0987"
+"INFO: Friday 8th July 2022 0965"
+"WARN: Tuesday 11th Jan 2021 0557"
+
+Problem statement:
+q1)We want to first create a list from the above data 
+q2)We want to create an rdd out the list that we create 
+q3)We want to calculate the count of WARN,INFO,ERROR  
+
+
+Code In scala:
+
+sol1)Creating List from the sample data 
+
+val myList = LIST("WARN: Tuesday 4th sep 2023 0408",
+                "WARN: Tuesday 5th Sep 2023 0897",
+                "ERROR: Thursday 8th Nov 2022 0987",
+                "INFO: Friday 8th July 2022 0965",
+                "WARN: Tuesday 11th Jan 2021 0557")
+
+sol2) creating rdd from collection
+val rdd1 = sc.parallelize(myList)
+
+
+Sol3)
+
+val rdd2 = rdd1.map(x=>{
+	                    val columns = x.split(":")
+	                    val logLevel = columns(0)
+	                    (logLevel,1)
+                    })
+
+val rdd3 = rdd2.reduceByKey((x,y)=> x+y)
+
+rdd3.saveAsTextFile("/user/cloudera/sparkoutput/")
+
+Final Output after transaformation:
+(WARN,3) (INFO,1) (ERROR,1)
+
+
+Code in pyspark:
+=================
+# Sol1: Creating List from the sample data
+myList = ["WARN: Tuesday 4th sep 2023 0408",
+          "WARN: Tuesday 5th Sep 2023 0897",
+          "ERROR: Thursday 8th Nov 2022 0987",
+          "INFO: Friday 8th July 2022 0965",
+          "WARN: Tuesday 11th Jan 2021 0557"]
+
+# Sol2: Creating RDD from collection
+rdd1 = sc.parallelize(myList)
+
+# Sol3: Mapping each line of RDD, extracting log level, and mapping to (logLevel, 1)
+rdd2 = rdd1.map(lambda x: (x.split(":")[0], 1))
+
+# Reducing by key to count occurrences of each log level
+rdd3 = rdd2.reduceByKey(lambda x, y: x + y)
+
+# Saving the RDD to text file
+rdd3.saveAsTextFile("/user/cloudera/sparkoutput/")
